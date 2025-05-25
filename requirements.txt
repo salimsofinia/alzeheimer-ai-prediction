@@ -5,3 +5,4 @@ seaborn
 scipy
 scikit-learn
 streamlit
+tf-nightly==2.20.0.dev20250516
