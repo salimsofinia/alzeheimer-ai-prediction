@@ -244,7 +244,7 @@ elif page == 4:
     st.pyplot(fig3)
 
 elif page == 5:
-    # Model Evaluation (unchanged)
+    # Model Evaluation
     if "model" not in st.session_state:
         st.error("You need to train the model first (go to the Build Model page).")
         st.stop()
@@ -261,14 +261,33 @@ elif page == 5:
     scaler.fit(X_train_pca)
     X_test_scaled = scaler.transform(X_test_pca)
 
-    preds = model.predict(X_test_scaled)
+    # --- Predictions ---
+    preds = model.predict(X_test_scaled).ravel()
     preds = (preds > 0.5).astype(int)
 
+    # --- ROC & AUC ---
+    probs = model.predict(X_test_scaled).ravel()
+    from sklearn.metrics import roc_curve, roc_auc_score
+    fpr, tpr, _ = roc_curve(y_test, probs)
+    auc_score = roc_auc_score(y_test, probs)
+
+    st.subheader("ROC Curve")
+    fig_roc, ax_roc = plt.subplots(figsize=(6, 4))
+    ax_roc.plot(fpr, tpr, label=f"AUC = {auc_score:.2f}")
+    ax_roc.plot([0, 1], [0, 1], "k--", linewidth=1)
+    ax_roc.set_xlabel("False Positive Rate")
+    ax_roc.set_ylabel("True Positive Rate")
+    ax_roc.legend(loc="lower right")
+    st.pyplot(fig_roc)
+    st.write(f"**AUC:** {auc_score:.4f}")
+
+    # --- Classification Report ---
     st.subheader("Classification Report")
     report_dict = classification_report(y_test, preds, output_dict=True)
     report_df = pd.DataFrame(report_dict).transpose()
     st.dataframe(report_df)
 
+    # --- Confusion Matrix ---
     st.subheader("Confusion Matrix")
     cm = confusion_matrix(y_test, preds)
     fig, ax = plt.subplots(figsize=(6, 4))
@@ -277,16 +296,37 @@ elif page == 5:
     ax.set_ylabel('Actual')
     st.pyplot(fig)
 
+    # --- Accuracy ---
     st.subheader("Accuracy Score")
     acc = accuracy_score(y_test, preds)
     st.write(f"Accuracy: {acc:.4%}")
 
+    st.session_state["eval_metrics"] = {
+        "accuracy": acc,
+        "auc":      auc_score,
+        "precision": report_dict["1"]["precision"],
+        "recall":    report_dict["1"]["recall"],
+        "f1":        report_dict["1"]["f1-score"]
+    }
 else:
-    # Conclusion (unchanged)
     st.subheader("Conclusion")
-    st.write(
-        "In this analysis, Alzheimer's disease prediction was performed. "
-        "Exploratory data analysis provided insights into feature distributions and correlations. "
-        "PCA reduced feature dimensionality, followed by training an ANN achieving reasonable accuracy. "
-        "Further tuning and data expansion could improve performance."
-    )
+    metrics = st.session_state.get("eval_metrics")
+
+    if metrics:
+        acc   = metrics["accuracy"]
+        auc   = metrics["auc"]
+        prec  = metrics["precision"]
+        rec   = metrics["recall"]
+        f1    = metrics["f1"]
+
+        st.write(
+            f"In this pipeline, our ANN achieved an overall accuracy of **{acc:.2%}**, "
+            f"meaning it correctly classified **{acc:.2%}** of all cases. "
+            f"The ROC AUC of **{auc:.2f}** indicates strong discrimination between healthy and diseased subjects across all thresholds. "
+            f"For the disease class, a precision of **{prec:.2%}** shows that when the model predicts Alzheimer’s, it is correct **{prec:.2%}** of the time (limiting false positives), "
+            f"while a recall of **{rec:.2%}** demonstrates it successfully identifies {rec:.2%} of actual Alzheimer’s cases (minimizing false negatives). "
+            f"The F1-score of **{f1:.2%}**, as the harmonic mean of precision and recall, confirms a balanced performance between sensitivity and specificity. "
+            "These results underline that our model not only makes accurate predictions, but also maintains reliable detection power for the positive class."
+        )
+    else:
+        st.write("No evaluation metrics found. Please run the Model Evaluation step first.")
