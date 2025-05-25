@@ -459,4 +459,7 @@ plt.ylabel('Truth')
 
 # 8. Conclusion
 
-print("In this Kaggle Notebook, Alzheimer's disease is predicted. First, we performed an exploratory data analysis using various charts to understand the relationships among the features as well as the target variable.\nAdditionally, we developed the data preprocessing to determine the features with further repercussion on the prediction of Alzheimer's disease, as well as the data splitting and normalization.\nSubsequently, we built the model by training an artificial neural network, reaching an accuracy higher than 60%, and evaluated the trained model, concluding that the model is not overfitting.\nThank you for exploring this notebook! If you find it helpful, please consider upvoting it ❤️.\nYour support is always appreciated 🤩!")
+print("In this analysis, Alzheimer's disease prediction was performed. "
+        "Exploratory data analysis provided insights into feature distributions and correlations. "
+        "PCA reduced feature dimensionality, followed by training an ANN achieving reasonable accuracy. "
+        "Further tuning and data expansion could improve performance.")
