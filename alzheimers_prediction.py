@@ -19,7 +19,7 @@ st.title("Alzheimer's Prediction")
 sections = [
     "Load Data",
     "Data Statistics",
-    "Data Visualization",
+    "Data Visualisation",
     "Data Pre-processing",
     "Build Model (Neural Network)",
     "Evaluate Model",
@@ -162,6 +162,7 @@ elif page == 4:
     st.subheader("Model Building and Training")
     model = keras.Sequential([
         keras.layers.Dense(X_train_scaled.shape[1], activation='relu', input_shape=(X_train_scaled.shape[1],)),
+        keras.layers.Dense(6, activation='relu'),
         keras.layers.Dense(4, activation='relu'),
         keras.layers.Dense(2, activation='relu'),
         keras.layers.Dense(1, activation='sigmoid')
@@ -171,7 +172,7 @@ elif page == 4:
     with st.spinner("Training model with validation split…"):
         history = model.fit(
             X_train_scaled, y_train,
-            epochs=70, validation_split=0.2, verbose=0
+            epochs=100, validation_split=0.2, verbose=0
         )
     st.success("Training complete!")
     st.session_state.model = model
