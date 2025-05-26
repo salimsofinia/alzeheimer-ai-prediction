@@ -1,0 +1,10 @@
+Here’s how to get the Alzheimer’s Prediction app up and running:
+
+1. Prepare the files
+    Ensure alzheimers_prediction.py, requirements.txt, and the data file alzheimers_disease_data.csv are all in the same project folder. 
+
+2. Install dependencies
+    In your terminal (or command prompt), navigate to that folder and run: pip install -r requirements.txt
+
+3. Launch the Streamlit app
+    From the same folder, execute in the terminal: streamlit run alzheimers_prediction.py
